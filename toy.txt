@@ -1,0 +1,106 @@
+Grammar:
+
+Rule 0     S' -> s
+Rule 1     s -> e
+Rule 2     s -> v = e
+Rule 3     e -> v
+Rule 4     v -> * e
+Rule 5     v -> X
+
+Terminals, with rules where they appear:
+
+*                    : 4
+=                    : 2
+X                    : 5
+error                : 
+
+Nonterminals, with rules where they appear:
+
+e                    : 1 2 4
+s                    : 0
+v                    : 2 3
+
+
+state 0
+
+    (0) S' -> . s
+    (1) s -> . e
+    (2) s -> . v = e
+    (3) e -> . v
+    (4) v -> . * e
+    (5) v -> . X
+    *               shift and go to state 4
+    X               shift and go to state 5
+
+    s                              shift and go to state 1
+    e                              shift and go to state 2
+    v                              shift and go to state 3
+
+state 1
+
+    (0) S' -> s .
+
+
+state 2
+
+    (1) s -> e .
+    $end            reduce using rule 1 (s -> e .)
+
+
+state 3
+
+    (2) s -> v . = e
+    (3) e -> v .
+    =               shift and go to state 6
+    $end            reduce using rule 3 (e -> v .)
+
+
+state 4
+
+    (4) v -> * . e
+    (3) e -> . v
+    (4) v -> . * e
+    (5) v -> . X
+    *               shift and go to state 4
+    X               shift and go to state 5
+
+    e                              shift and go to state 7
+    v                              shift and go to state 8
+
+state 5
+
+    (5) v -> X .
+    =               reduce using rule 5 (v -> X .)
+    $end            reduce using rule 5 (v -> X .)
+
+
+state 6
+
+    (2) s -> v = . e
+    (3) e -> . v
+    (4) v -> . * e
+    (5) v -> . X
+    *               shift and go to state 4
+    X               shift and go to state 5
+
+    v                              shift and go to state 8
+    e                              shift and go to state 9
+
+state 7
+
+    (4) v -> * e .
+    =               reduce using rule 4 (v -> * e .)
+    $end            reduce using rule 4 (v -> * e .)
+
+
+state 8
+
+    (3) e -> v .
+    =               reduce using rule 3 (e -> v .)
+    $end            reduce using rule 3 (e -> v .)
+
+
+state 9
+
+    (2) s -> v = e .
+    $end            reduce using rule 2 (s -> v = e .)
