@@ -1,0 +1,32 @@
+// AST
+digraph AST {
+	node [color=deepskyblue shape=box style=filled]
+	edge [arrowhead=none]
+	n01 [label="TranslationUnit\n"]
+	n02 [label="FuncDefinition\nname:'Variable(name='main')'\ntype: int\nstatic: False\n params : [('int', Variable(name='c')), ('char', Variable(name='b'))]"]
+	n03 [label="VarDefinition\ntype:'int'\nextern: 'False'"]
+	n04 [label="Variable\nname='x'"]
+	n03 -> n04
+	n02 -> n03
+	n05 [label="VarDefinition\ntype:'int'\nextern: 'False'"]
+	n06 [label="Variable\nname='y'"]
+	n05 -> n06
+	n02 -> n05
+	n07 [label=ExprStmt]
+	n08 [label="Binary\nAssignment"]
+	n09 [label="Literal\nname='x"]
+	n08 -> n09
+	n10 [label="Literal\nname='2"]
+	n08 -> n10
+	n07 [label=n08]
+	n02 -> n07
+	n11 [label=ExprStmt]
+	n12 [label="Binary\nAssignment"]
+	n13 [label="Literal\nname='y"]
+	n12 -> n13
+	n14 [label="Literal\nname='3"]
+	n12 -> n14
+	n11 [label=n12]
+	n02 -> n11
+	n01 -> n02
+}
