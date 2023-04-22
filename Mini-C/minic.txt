@@ -89,11 +89,11 @@ Rule 85    empty -> <empty>
 
 Unused terminals:
 
-    LOR
-    LAND
-    MULEQ
-    MODEQ
     DIVEQ
+    LAND
+    MODEQ
+    MULEQ
+    LOR
     CONST
 
 Terminals, with rules where they appear:

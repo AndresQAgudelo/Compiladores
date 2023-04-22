@@ -11,7 +11,6 @@ int main(int c) {
     x >= 2;
     x < 2;
     x <= 2;
-    return 0;
 }
 
 /* Falta agregar verificacion de variable definida*/

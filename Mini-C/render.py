@@ -64,7 +64,8 @@ class RenderAST(Visitor):
             label=fr"VarDefinition\ntype:'{node.type}'\nextern: '{node.extern}'"
             )
         
-        self.dot.edge(name, self.visit(node.expr))
+        if node.expr:
+            self.dot.edge(name, self.visit(node.expr))
         return name
 
     def visit(self, node:Variable):
@@ -82,13 +83,14 @@ class RenderAST(Visitor):
         self.dot.node(name,
             label='ExprStmt')
         
-        self.dot.node(name, node.expr.accept(self))
+        if node.expr:
+            self.dot.edge(name, node.expr.accept(self))
             
         return name
     
     def visit(self, node:Binary):
         name = self.name()
-        self.dot.node(name, label="Binary\\nAssignment")
+        self.dot.node(name, label=f"Binary\\n {node.op} ")
         self.dot.edge(name, node.left.accept(self))
         self.dot.edge(name, node.right.accept(self))
         return name
@@ -125,6 +127,5 @@ if __name__ == '__main__':
     #ast.accept(dot)
 
     print(dot)
-
     dot.save("AST.dot")
     
