@@ -44,18 +44,58 @@ class RenderAST(Visitor):
             label="TranslationUnit\\n"
             )
         for n in node.decl:
+            print(n)
             self.dot.edge(name, self.visit(n))
+            
         return name
     
     def visit(self, node : FuncDefinition):
         name = self.name()
         self.dot.node(name,
-            label=fr"FuncDefinition\nname:'{node.name}'\ntype: {node.type}\nstatic: {node.static}\n params : {node.params}",
+            label=f"FuncDefinition \n name : {node.name} \n type : {node.type} \n static : {node.static} \n extern : {node.extern}",
             )
         
-        for n in node.stmts:
+        print(node.params)
+        self.dot.edge(name, self.visit(node.params))
+        
+        return name
+    
+    def visit(self, node: ParamList):
+        name = self.name()
+        self.dot.node(name,
+            label=f"ParamList \n ellipsis : {node.ellipsis} \n params : {node.int} ",
+            )
+
+        for n in node.int:
+            print(n)
             self.dot.edge(name, self.visit(n))
-            
+        
+        return name
+
+    def visit (self, node: Parameter):
+        name = self.name
+        self.dot.node(name, label="Parameter")
+
+        return name
+
+        
+    '''    
+
+    def visit(self, node:Variable):
+        name = self.name()
+        self.dot.node(name, label=f"Variable\\nname='{node.name}'")
+        return name
+    
+
+    
+    def visit(self, node : CompoundStmt):
+        name = self.name()
+        self.dot.node(name,
+            label="CompountStmt",
+            )
+        
+        self.dot.edge(name, self.visit(node.decl))
+
         return name
     
     def visit(self, node : VarDefinition):
@@ -68,25 +108,12 @@ class RenderAST(Visitor):
             self.dot.edge(name, self.visit(node.expr))
         return name
 
-    def visit(self, node:Variable):
-        name = self.name()
-        self.dot.node(name, label=f"Variable\\nname='{node.name}'")
-        return name
-    
-    def visit(self, node:Literal):
+
+    def visit(self, node:Integer):
         name = self.name()
         self.dot.node(name, label=f"Literal\\nname='{node.value}")
         return name
     
-    def visit(self, node:ExprStmt):
-        name = self.name()
-        self.dot.node(name,
-            label='ExprStmt')
-        
-        if node.expr:
-            self.dot.edge(name, node.expr.accept(self))
-            
-        return name
     
     def visit(self, node:Binary):
         name = self.name()
@@ -101,7 +128,7 @@ class RenderAST(Visitor):
         self.dot.edge(name, n.expr.accept(self))
         return name
     
-'''
+''''''
 
     # DECLARACIONES
     '''

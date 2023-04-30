@@ -3,21 +3,7 @@ import sly
 from rich import print
 
 from mclex import Lexer
-from mcast import (TranslationUnit,
-    FuncDefinition,
-    WhileLoop,
-    ForLoop,
-    Continue,
-    Binary,
-    Unary,
-    Variable,
-    Literal,
-    ExprStmt,
-    Return,
-    IfStmt,
-    Break,
-    VarDefinition
-    ) 
+from mcast import * 
 
 class Parser(sly.Parser):
     debugfile = "minic.txt"
@@ -43,19 +29,28 @@ class Parser(sly.Parser):
 
     @_("type_specifier declarator compound_statement")
     def function_definition(self, p):
-        return FuncDefinition( p.type_specifier, p.declarator[0], p.declarator[1], p.compound_statement )
+        return FuncDefinition( p.type_specifier, *p.declarator, p.compound_statement )
 
     @_("STATIC type_specifier declarator compound_statement")
     def function_definition(self, p):
-        return FuncDefinition(p.type_specifier, p.declarator[0], p.declarator[1], p.compound_statement, True)
-
+        if isinstance(p.declarator, tuple):
+            return FuncDefinition(p.type_specifier, *p.declarator, p.compound_statement, static=True)
+        else:
+            return VarDefinition(p.type_specifier, p.declarator, static=True)
+        
     @_("type_specifier declarator ';'")
     def declaration(self, p):
-        return VarDefinition(p.type_specifier,  p.declarator)
+        if isinstance(p.declarator, tuple):
+            return FuncDefinition(p.type_specifier, *p.declarator)
+        else:
+            return VarDefinition(p.type_specifier, p.declarator)
 
     @_("EXTERN type_specifier declarator ';'")
     def declaration(self, p):
-        return VarDefinition(p.type_specifier,  p.declarator, None)
+        if isinstance(p.declarator, tuple):
+            return FuncDefinition(p.type_specifier, *p.declarator, p.compound_statement, extern=True)
+        else:
+            return VarDefinition(p.type_specifier, p.declarator, extern=True)
 
     @_("empty")
     def declaration_list_opt(self, p):
@@ -83,12 +78,12 @@ class Parser(sly.Parser):
 
     @_("'*' declarator")
     def declarator(self, p):
-        return (p[0], p.declarator)
+        return p[0] + p.declarator
 
     @_("ID")
     def direct_declarator(self, p):
-        return Variable(p.ID)
-
+        return p.ID
+    
     @_("direct_declarator '(' parameter_type_list ')'")
     def direct_declarator(self, p):
         return ( p.direct_declarator, p.parameter_type_list )
@@ -99,11 +94,11 @@ class Parser(sly.Parser):
 
     @_("parameter_list")
     def parameter_type_list(self, p):
-        return p.parameter_list
+        return ParamList(p.parameter_list)
 
     @_("parameter_list ',' ELLIPSIS")
     def parameter_type_list(self, p):
-        return (p.parameter_list, p.ELLIPSIS)
+        return ParamList(p.parameter_list, ellipsis=True)
 
     @_("parameter_declaration")
     def parameter_list(self, p):
@@ -115,19 +110,19 @@ class Parser(sly.Parser):
 
     @_("type_specifier declarator")
     def parameter_declaration(self, p):
-        return (p.type_specifier, p.declarator)
+        return Parameter(p.type_specifier, p.declarator)
 
     @_("'{' declaration_list_opt statement_list '}'")
     def compound_statement(self, p):
-        return p.declaration_list_opt +  p.statement_list
+        return CompoundStmt  (p.declaration_list_opt, p.statement_list)
     
     @_("'{' declaration_list_opt '}'")
     def compound_statement(self, p):
-        return p.declaration_list_opt
+        return CompoundStmt( stmt = p.declaration_list_opt)
 
     @_("expression ';'")
     def expression_statement(self, p):
-        return ExprStmt(p.expression)
+        return p.expression
 
     @_("equality_expression")
     def expression(self, p):
@@ -135,9 +130,12 @@ class Parser(sly.Parser):
 
     @_("equality_expression '='   expression",
        "equality_expression ADDEQ expression",
-       "equality_expression SUBEQ expression")
+       "equality_expression SUBEQ expression",
+        "equality_expression MULEQ expression",
+        "equality_expression DIVEQ expression",
+        "equality_expression MODEQ expression",)
     def expression(self, p):
-        return Binary(p[1], p.equality_expression, p.expression)
+        return Assignment(p[1], p.equality_expression, p.expression)
         
     @_("relational_expression")
     def equality_expression(self, p):
@@ -165,15 +163,15 @@ class Parser(sly.Parser):
 
     @_("postfix_expression '(' argument_expression_list ')'")
     def postfix_expression(self, p):
-        return (p.postfix_expression, p.argument_expression_list)
+        return Call(p.postfix_expression, p.argument_expression_list)
 
     @_("postfix_expression '(' ')'")
     def postfix_expression(self, p):
-        return p.postfix_expression
+        return Call(p.postfix_expression)
 
     @_("postfix_expression '[' expression ']'")
     def postfix_expression(self, p):
-        return (p.postfix_expression, p.expression)
+        return Array(p.postfix_expression, p.expression)
 
     @_("expression")
     def argument_expression_list(self, p):
@@ -189,7 +187,7 @@ class Parser(sly.Parser):
 
     @_("'-' unary_expression")
     def unary_expression(self, p):
-        return Unary(p[0], p.unary_expression)
+        return Negative(p[0], p.unary_expression)
 
     @_("'+' unary_expression")
     def unary_expression(self, p):
@@ -197,15 +195,15 @@ class Parser(sly.Parser):
 
     @_("'!' unary_expression")
     def unary_expression(self, p):
-        return Unary(p[0], p.unary_expression)
+        return Not(p[0], p.unary_expression)
 
     @_("'*' unary_expression")
     def unary_expression(self, p):
-        return Unary(p[0], p.unary_expression)
+        return Pointer(p[0], p.unary_expression)
 
     @_("'&' unary_expression")
     def unary_expression(self, p):
-        return Unary(p[0], p.unary_expression)
+        return AddrOf(p[0], p.unary_expression)
 
     @_("unary_expression")
     def mult_expression(self, p):
@@ -224,27 +222,27 @@ class Parser(sly.Parser):
     @_("additive_expression '+' mult_expression",
        "additive_expression '-' mult_expression")
     def additive_expression(self, p):
-        return (p[1], p.additive_expression, p.mult_expression )
+        return Binary(p[1], p.additive_expression, p.mult_expression )
 
     @_("ID")
     def primary_expression(self, p):
-        return Literal(p.ID)
+        return Ident(p.ID)
 
     @_("INUMBER")
     def primary_expression(self, p):
-        return Literal(p.INUMBER)
+        return Integer(p.INUMBER)
 
     @_("FNUMBER")
     def primary_expression(self, p):
-        return Literal(p.FNUMBER)
+        return Float(p.FNUMBER)
 
     @_("CHARACTER")
     def primary_expression(self, p):
-        return Literal(p.CHARACTER)
+        return Char(p.CHARACTER)
 
     @_("string_literal")
     def primary_expression(self, p):
-        return p.string_literal
+        return String(p.string_literal)
 
     @_("'(' expression ')'")
     def primary_expression(self, p):
@@ -252,11 +250,11 @@ class Parser(sly.Parser):
 
     @_("STRING")
     def string_literal(self, p):
-        return Literal(p.STRING)
+        return p.STRING
 
     @_("string_literal STRING")
     def string_literal(self, p):
-        return (p.string_literal + p.STRING)
+        return p.string_literal + p.STRING
 
     @_("compound_statement",
        "expression_statement",

@@ -73,6 +73,10 @@ class Expression(Node):
     '''
     pass
 
+@dataclass
+class Literal(Expression):
+    pass
+
 
 @dataclass
 class Declaration(Statement):
@@ -95,20 +99,42 @@ class FuncDefinition(Declaration):
     params: List[Declaration] = field(default_factory=list)
     stmts : List[Statement] = field(default_factory=list)
     static: bool = False
+    extern: bool = False
 
 @dataclass
 class VarDefinition(Declaration):
     type : str
     expr : Expression
     extern : bool = False
+    static : bool = False
 
+@dataclass
+class Parameter(Declaration):
+    type : str
+    name :str
+
+
+@dataclass
+class ParamList(Declaration):
+    int  : str
+    ellipsis : bool = False 
     
 # Statement
 
 @dataclass
 class TranslationUnit(Statement):
-    decl: List[Statement] = field(default_factory=list)
+    decl : List[Statement] = field(default_factory=list)
 
+@dataclass
+class CompoundStmt(Statement):
+    decl :  List[Declaration] = field(default_factory=list)
+    stmt :  List[Statement] = field(default_factory=list)
+
+@dataclass
+class Assignment(Statement):
+    op  : str
+    loc : Expression
+    expr: Expression
 
 @dataclass
 class WhileLoop(Statement):
@@ -130,7 +156,7 @@ class Continue(Statement):
 
 @dataclass
 class Return(Statement):
-    expr  : Expression
+    expr  : Expression = None
 
 @dataclass
 class Break(Statement):
@@ -141,12 +167,35 @@ class IfStmt(Statement):
     cond   : Expression
     cons   : List [Statement]=field(default_factory=list) #el consecuente
     altr   : List [Statement]=field(default_factory=list)
-@dataclass
-class ExprStmt(Statement): 
-    expr  : Expression
+
+
 
 
 # Expresiones
+
+@dataclass
+class Integer(Literal):
+    type  : str = field(init=False, default='int')
+    value : int
+
+@dataclass
+class Float(Literal):
+    type  : str = field(init=False, default='float')
+    value : float
+
+@dataclass
+class Char(Literal):
+    type  : str = field(init=False, default='char')
+    value : str
+
+    def __post_init__(self):
+        assert len(self)
+
+@dataclass
+class String(Literal):
+    type  : str = field(init=False, default='char *')
+    value : str
+
 
 @dataclass
 class Binary(Expression):
@@ -154,17 +203,49 @@ class Binary(Expression):
     left : Expression
     right: Expression
 
-@dataclass
-class Unary(Expression):
-    op   : str 
-    expr : Expression
 
 @dataclass
 class Variable(Expression):
     name : str
 
 @dataclass
-class Literal(Expression):
-    value : any
+class Unary(Expression):
+    op : str
+    expr : Expression
+
+@dataclass
+class Pointer(Unary):
+    pass
+
+@dataclass
+class Negative(Unary):
+    pass
+
+@dataclass
+class Not(Unary):
+    pass
+
+@dataclass
+class Pointer(Unary):
+    pass
+
+@dataclass
+class AddrOf(Unary):
+    pass
+
+@dataclass
+class Ident(Expression):
+    name : str
+
+@dataclass
+class Array(Expression):
+    expr : Expression
+    index : Expression
+
+@dataclass
+class Call(Expression):
+    func : Expression
+    arglist : List[Expression] = field(default_factory=list)
+
 
 
