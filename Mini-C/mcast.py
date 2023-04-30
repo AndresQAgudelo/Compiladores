@@ -110,13 +110,13 @@ class VarDefinition(Declaration):
 
 @dataclass
 class Parameter(Declaration):
-    type : str
+    int : str
     name :str
 
 
 @dataclass
 class ParamList(Declaration):
-    int  : str
+    params : List[Parameter]
     ellipsis : bool = False 
     
 # Statement

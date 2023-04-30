@@ -92,9 +92,9 @@ Rule 88    empty -> <empty>
 
 Unused terminals:
 
-    CONST
-    LOR
     LAND
+    LOR
+    CONST
 
 Terminals, with rules where they appear:
 

@@ -78,11 +78,11 @@ class Parser(sly.Parser):
 
     @_("'*' declarator")
     def declarator(self, p):
-        return p[0] + p.declarator
+        return Pointer(p[0], p.declarator)
 
     @_("ID")
     def direct_declarator(self, p):
-        return p.ID
+        return Ident(p.ID)
     
     @_("direct_declarator '(' parameter_type_list ')'")
     def direct_declarator(self, p):
@@ -90,7 +90,7 @@ class Parser(sly.Parser):
 
     @_("direct_declarator '(' ')'")
     def direct_declarator(self, p):
-        return p.direct_declarator
+        return (p.direct_declarator)
 
     @_("parameter_list")
     def parameter_type_list(self, p):
@@ -118,7 +118,7 @@ class Parser(sly.Parser):
     
     @_("'{' declaration_list_opt '}'")
     def compound_statement(self, p):
-        return CompoundStmt( stmt = p.declaration_list_opt)
+        return CompoundStmt( decl = p.declaration_list_opt)
 
     @_("expression ';'")
     def expression_statement(self, p):

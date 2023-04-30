@@ -4,13 +4,20 @@ digraph AST {
 	edge [arrowhead=none]
 	n01 [label="TranslationUnit\n"]
 	n02 [label="FuncDefinition 
- name : main 
+ name : Ident(name='main') 
  type : int 
  static : True 
  extern : False"]
 	n03 [label="ParamList 
- ellipsis : False 
- params : [Parameter(type='int', name='c'), Parameter(type='int', name='**b')] "]
+ ellipsis : False "]
+	n04 [label=Parameter]
+	n03 -> n04
+	n05 [label=Parameter]
+	n03 -> n05
 	n02 -> n03
+	n06 [label=CompountStmt]
+	n07 [label="VarDefinition\ntype:'int'\nextern: 'False'"]
+	n06 -> n07
+	n02 -> n06
 	n01 -> n02
 }

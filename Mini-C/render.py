@@ -57,27 +57,71 @@ class RenderAST(Visitor):
         
         print(node.params)
         self.dot.edge(name, self.visit(node.params))
+        print(node.stmts)
+        self.dot.edge(name, self.visit(node.stmts))
         
         return name
     
     def visit(self, node: ParamList):
         name = self.name()
         self.dot.node(name,
-            label=f"ParamList \n ellipsis : {node.ellipsis} \n params : {node.int} ",
+            label=f"ParamList \n ellipsis : {node.ellipsis} ",
             )
 
-        for n in node.int:
+        for n in node.params:
             print(n)
             self.dot.edge(name, self.visit(n))
         
         return name
 
-    def visit (self, node: Parameter):
-        name = self.name
-        self.dot.node(name, label="Parameter")
-
+    def visit(self, node :Parameter):
+        name = self.name()
+        self.dot.node(name, label= "Parameter")
+        
         return name
 
+    def visit(self, node : CompoundStmt):
+        name = self.name()
+        self.dot.node(name,
+            label="CompountStmt",
+            )
+        if node.decl:
+            for n in node.decl:
+                print(n)
+                self.dot.edge(name, self.visit(n))
+
+        return name
+    
+    def visit(self, node : VarDefinition):
+        name = self.name()
+        self.dot.node(name,
+            label=fr"VarDefinition\ntype:'{node.type}'\nextern: '{node.extern}'"
+            )
+        
+        #if node.expr:
+            #self.dot.edge(name, self.visit(node.expr))
+        return name
+    
+    def visit(self, node : Ident):
+        name = self.name()
+        self.dot.name(name, label= "Ident")
+        return name
+    def visit(self, node:Assignment):
+        name = self.name()
+        self.dot.node(name, label=f"Assignment\\n {node.op} ")
+        self.dot.edge(name, node.left.accept(self))
+        self.dot.edge(name, node.right.accept(self))
+        return name
+
+    def visit(self, node:Binary):
+        name = self.name()
+        self.dot.node(name, label=f"Binary\\n {node.op} ")
+        self.dot.edge(name, node.left.accept(self))
+        self.dot.edge(name, node.right.accept(self))
+        return name
+    
+
+    
         
     '''    
 
@@ -88,15 +132,7 @@ class RenderAST(Visitor):
     
 
     
-    def visit(self, node : CompoundStmt):
-        name = self.name()
-        self.dot.node(name,
-            label="CompountStmt",
-            )
-        
-        self.dot.edge(name, self.visit(node.decl))
 
-        return name
     
     def visit(self, node : VarDefinition):
         name = self.name()
@@ -115,12 +151,7 @@ class RenderAST(Visitor):
         return name
     
     
-    def visit(self, node:Binary):
-        name = self.name()
-        self.dot.node(name, label=f"Binary\\n {node.op} ")
-        self.dot.edge(name, node.left.accept(self))
-        self.dot.edge(name, node.right.accept(self))
-        return name
+
     
     def visit(self, n:Unary):
         name = self.name()
