@@ -13,5 +13,5 @@ int main(int c) {
     x <= 2;
 }
 
-/* Falta agregar verificacion de variable definida*/
+
 

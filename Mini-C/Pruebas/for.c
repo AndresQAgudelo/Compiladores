@@ -1,5 +1,6 @@
-int main(int c) {  
-    for(int i = 0; i < 9; i+=1){
-        printf("%d", i);
+int main(int c) {
+    int i;  
+    for(i = 0; i < 9; i+=1){
+        n + 2;
     }
 }

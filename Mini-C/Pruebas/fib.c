@@ -10,7 +10,7 @@ int main(int argc, char *argv) {
     int n; 
     n = 20;
 
-    printf("%d", fib(n));
+    printf(fib(n));
 
     return 0;
 }

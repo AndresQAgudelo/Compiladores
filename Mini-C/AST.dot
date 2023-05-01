@@ -3,21 +3,29 @@ digraph AST {
 	node [color=deepskyblue shape=box style=filled]
 	edge [arrowhead=none]
 	n01 [label="TranslationUnit\n"]
-	n02 [label="FuncDefinition 
- name : Ident(name='main') 
+	n02 [label="FuncDefinition  
  type : int 
  static : True 
  extern : False"]
-	n03 [label="ParamList 
- ellipsis : False "]
-	n04 [label=Parameter]
-	n03 -> n04
-	n05 [label=Parameter]
-	n03 -> n05
+	n03 [label="Ident 
+ name :'main'"]
 	n02 -> n03
-	n06 [label=CompountStmt]
-	n07 [label="VarDefinition\ntype:'int'\nextern: 'False'"]
-	n06 -> n07
-	n02 -> n06
+	n04 [label="ParamList 
+ ellipsis : False "]
+	n05 [label="Parameter 
+ type :int"]
+	n06 [label="Ident 
+ name :'c'"]
+	n05 -> n06
+	n04 -> n05
+	n02 -> n04
+	n07 [label=CompountStmt]
+	n08 [label="Not 
+ op : !"]
+	n09 [label="Ident 
+ name :'c'"]
+	n08 -> n09
+	n07 -> n08 [label=stmt]
+	n02 -> n07
 	n01 -> n02
 }

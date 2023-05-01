@@ -33,6 +33,7 @@ class Parser(sly.Parser):
 
     @_("STATIC type_specifier declarator compound_statement")
     def function_definition(self, p):
+        print(f"Parse: {p.declarator}")
         if isinstance(p.declarator, tuple):
             return FuncDefinition(p.type_specifier, *p.declarator, p.compound_statement, static=True)
         else:

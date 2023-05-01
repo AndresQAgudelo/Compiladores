@@ -42,7 +42,6 @@ from multimethod import multimeta
 from typing      import List
 
 
-
 # ----------------------------------------------------------------------
 # Clases Abstractas
 # ----------------------------------------------------------------------
@@ -73,10 +72,6 @@ class Expression(Node):
     '''
     pass
 
-@dataclass
-class Literal(Expression):
-    pass
-
 
 @dataclass
 class Declaration(Statement):
@@ -90,51 +85,19 @@ class Declaration(Statement):
 # Clases Concretas
 # ----------------------------------------------------------------------
 
-# Declaraciones
-
-@dataclass
-class FuncDefinition(Declaration):
-    type  : str 
-    name  : str
-    params: List[Declaration] = field(default_factory=list)
-    stmts : List[Statement] = field(default_factory=list)
-    static: bool = False
-    extern: bool = False
-
-@dataclass
-class VarDefinition(Declaration):
-    type : str
-    expr : Expression
-    extern : bool = False
-    static : bool = False
-
-@dataclass
-class Parameter(Declaration):
-    type : str
-    name : str
-
-
-@dataclass
-class ParamList(Declaration):
-    params : List[Parameter]
-    ellipsis : bool = False 
-    
-# Statement
+# Statements
 
 @dataclass
 class TranslationUnit(Statement):
-    decl : List[Statement] = field(default_factory=list)
+    decl: List[Declaration]
+
 
 @dataclass
-class CompoundStmt(Statement):
-    decl :  List[Declaration] = field(default_factory=list)
-    stmt :  List[Statement] = field(default_factory=list)
+class CompountStmt(Statement):
+    decls : List[Declaration]=field(default_factory=list)
+    stmts : List[Statement] = field(default_factory=list)
 
-@dataclass
-class Assignment(Statement):
-    op  : str
-    loc : Expression
-    expr: Expression
+# Instrucciones
 
 @dataclass
 class WhileLoop(Statement):
@@ -154,48 +117,36 @@ class ForLoop(Statement):
 class Continue(Statement):
     pass
 
+# Declaraciones
+
 @dataclass
-class Return(Statement):
+class Parameter(Declaration):
+    type : str
+    name : str
+
+@dataclass
+class ParamList(Declaration):
+    params  : List[Parameter]=field(default_factory=list)
+    ellipsis: bool = False
+
+@dataclass
+class FunctionDefn(Declaration):
+    type  : str 
+    name  : str
+    params: ParamList=field(default_factory=list)
+    stmts : CompountStmt=field(default_factory=list)
+    static: bool = False
+    extern: bool = False
+
+@dataclass
+class VariableDefn(Declaration):
+    type  : str
+    name  : str
     expr  : Expression = None
-
-@dataclass
-class Break(Statement):
-    pass
-
-@dataclass
-class IfStmt(Statement):
-    cond   : Expression
-    cons   : List [Statement]=field(default_factory=list) #el consecuente
-    altr   : List [Statement]=field(default_factory=list)
-
-
-
+    static: bool = False
+    extern: bool = False
 
 # Expresiones
-
-@dataclass
-class Integer(Literal):
-    type  : str = field(init=False, default='int')
-    value : int
-
-@dataclass
-class Float(Literal):
-    type  : str = field(init=False, default='float')
-    value : float
-
-@dataclass
-class Char(Literal):
-    type  : str = field(init=False, default='char')
-    value : str
-
-    def __post_init__(self):
-        assert len(self)
-
-@dataclass
-class String(Literal):
-    type  : str = field(init=False, default='char *')
-    value : str
-
 
 @dataclass
 class Binary(Expression):
@@ -203,51 +154,7 @@ class Binary(Expression):
     left : Expression
     right: Expression
 
-
-@dataclass
-class Variable(Expression):
-    name : str
-
-@dataclass
-class Ident(Expression):
-    name : str
-
 @dataclass
 class Unary(Expression):
-    op : str
+    op   : str 
     expr : Expression
-
-@dataclass
-class Pointer(Unary):
-    pass
-
-@dataclass
-class Negative(Unary):
-    pass
-
-@dataclass
-class Not(Unary):
-    pass
-
-@dataclass
-class Pointer(Unary):
-    pass
-
-@dataclass
-class AddrOf(Unary):
-    pass
-
-
-
-@dataclass
-class Array(Expression):
-    expr : Expression
-    index : Expression
-
-@dataclass
-class Call(Expression):
-    func : Expression
-    arglist : List[Expression] = field(default_factory=list)
-
-
-
